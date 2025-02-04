@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class URLCouner(models.Model):
+class URLCounter(models.Model):
     counter = models.BigIntegerField(
         verbose_name="Incremental counter for generating base62 string",
         default=0

@@ -1,17 +1,22 @@
 import string
+from django.db import transaction
 
-from shortner.models import URLCouner, URLs
+from shortner.models import URLCounter, URLs
 
 BASE62_ALPHABETS = string.ascii_letters + string.digits
 MAX_COUNTER_6 = 62**6 - 1
 
 
 class ShortnerClient:
+    """
+    A URL Shortner client to encode long urls into base62 format
+    Retries long url associates with short codes
+    """
 
     @staticmethod
     def encode_base62(number, length):
         """
-        Encode decimal number to base 62 format
+        Encode decimal number to base 62 string with a fixed length
         """
         result = []
         while number:
@@ -21,17 +26,25 @@ class ShortnerClient:
         # Padding with 'a'
         while len(result) < length:
             result.append(BASE62_ALPHABETS[0])
-        return ''.join(result[::-1])
+        return "".join(result[::-1])
 
     @staticmethod
     def get_next_short_code():
+        """
+        Generates the next short code based on a counter
+        """
         # TODO: If counter reaches limit for 6 chars, overrride length
-        counter_instance, _ = URLCouner.objects.get_or_create(id=1)
-        counter = counter_instance.counter
+        with transaction.atomic():
+            counter_instance, _ = URLCounter.objects.select_for_update().get_or_create( # noqa
+                id=1
+            )
+            counter = counter_instance.counter
 
-        short_code = ShortnerClient.encode_base62(number=counter, length=6)
-        counter_instance.counter = counter + 1
-        counter_instance.save()
+            short_code = ShortnerClient.encode_base62(number=counter, length=6)
+
+            # Atomic update to prevent race condition
+            counter_instance.counter = counter + 1
+            counter_instance.save()
 
         return short_code
 
@@ -40,7 +53,7 @@ class ShortnerClient:
         """
         Returns existing short url or creates a new one
         """
-        existing_long_url = URLs.objects.get(long_url=long_url)
+        existing_long_url = URLs.objects.filter(long_url=long_url).first()
         if existing_long_url:
             return existing_long_url.short_code
 
@@ -51,3 +64,13 @@ class ShortnerClient:
         URLs.objects.create(long_url=long_url, short_code=short_code)
 
         return short_code
+
+    @staticmethod
+    def get_long_url(short_code: str):
+        """
+        Returns long url associated with the short code
+        Raises `model.ObjectDoesNotExist` if not found
+        """
+
+        long_url = URLs.objects.get(short_code=short_code)
+        return long_url
