@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -54,10 +55,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "url_shortner.urls"
 
+SETTINGS_PATH = os.path.dirname(os.path.dirname(__file__))
+print(os.path.join(SETTINGS_PATH, 'templates'))
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(SETTINGS_PATH, 'templates')],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -68,6 +71,20 @@ TEMPLATES = [
             ],
         },
     },
+    {
+        'BACKEND': 'django_jinja.jinja2.Jinja2',
+        'DIRS': [os.path.join(SETTINGS_PATH, 'templates')],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'match_extension': '.html',
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    }
 ]
 
 WSGI_APPLICATION = "url_shortner.wsgi.application"
