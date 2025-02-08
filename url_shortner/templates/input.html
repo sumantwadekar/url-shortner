@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container">
-    <form hx-post="{% url 'shorten_url' %}" hx-target="#result" hx-swap="innerHTML">
+    <form hx-post="{{shorten_url}}" hx-target="#result" hx-swap="innerHTML">
         {% csrf_token %}
         <label for="url">Enter URL:</label>
         <input type="url" id="url" name="url" required placeholder="https://example.com">

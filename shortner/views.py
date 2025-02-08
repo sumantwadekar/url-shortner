@@ -2,6 +2,8 @@ import traceback
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect
+from django.urls import reverse
+
 
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
@@ -11,6 +13,8 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from drf_yasg.utils import swagger_auto_schema
 
+from core.utils import render_htmx
+from core import constants
 from domain.shortner.client import ShortnerClient
 from .serializer import URLSerializer
 
@@ -28,10 +32,24 @@ class RedirectToLongURLView(APIView):
 
 
 class URLViews(ViewSet):
-    # TODO: Add swagger required fields decorator
+
+    @action(
+        methods=["get"],
+        detail=False,
+        url_path="home",
+        url_name="home",
+    )
+    def home(self, request: HttpRequest):
+        context = {"shorten_url": reverse("shortner-shorten")}
+        return render_htmx(
+            request=request,
+            template_name=constants.INPUT_TMPL,
+            context=context,
+        )
+
     @swagger_auto_schema(
         request_body=URLSerializer,
-        responses={201: "Success"}
+        responses={201: "Success"},
     )
     @action(
         methods=["post"],
@@ -47,12 +65,19 @@ class URLViews(ViewSet):
 
             # Check if long url already exists
             short_code = ShortnerClient.get_or_create_short_url(
-                long_url=serializer.validated_data['long_url']
+                long_url=serializer.validated_data["long_url"]
             )
+
+            """
+            Return JSON response
             return Response(
                 data={"short_url": f"http://localhost:8000/{short_code}"},
                 status=201,
             )
+            """
+
+            # Return html response
+            render_htmx(request=request, template_name=constants.INPUT_TMPL)
         except ValidationError as e:
             print(f"Invalid request body. Error: {e}")
             traceback.print_exc()

@@ -14,7 +14,7 @@ import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent
 
 
 # Quick-start development settings - unsuitable for production
@@ -55,13 +55,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "url_shortner.urls"
 
-SETTINGS_PATH = os.path.dirname(os.path.dirname(__file__))
-print(os.path.join(SETTINGS_PATH, 'templates'))
+SETTINGS_PATH = os.path.dirname(__file__)
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(SETTINGS_PATH, 'templates')],
-        "APP_DIRS": True,
+        "DIRS": [os.path.join(BASE_DIR, 'templates')],
+        "APP_DIRS": False,
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
@@ -73,8 +72,8 @@ TEMPLATES = [
     },
     {
         'BACKEND': 'django_jinja.jinja2.Jinja2',
-        'DIRS': [os.path.join(SETTINGS_PATH, 'templates')],
-        'APP_DIRS': True,
+        "DIRS": [os.path.join(SETTINGS_PATH, 'templates')],
+        'APP_DIRS': False,
         'OPTIONS': {
             'match_extension': '.html',
             'context_processors': [
