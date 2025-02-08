@@ -41,9 +41,12 @@ class URLViews(ViewSet):
     )
     def home(self, request: HttpRequest):
         context = {"shorten_url": reverse("shortner-shorten")}
+        return_tmpl = constants.HOME_TMPL
+        if request.headers.get("HX-Request"):
+            return_tmpl = constants.INPUT_FORM_TMPL
         return render_htmx(
             request=request,
-            template_name=constants.INPUT_TMPL,
+            template_name=return_tmpl,
             context=context,
         )
 
@@ -76,8 +79,18 @@ class URLViews(ViewSet):
             )
             """
 
+            # context
+            context = {
+                "short_url": f"http://localhost:8000/{short_code}",
+                "input_url": reverse("shortner-home"),
+            }
+
             # Return html response
-            render_htmx(request=request, template_name=constants.INPUT_TMPL)
+            return render_htmx(
+                request=request,
+                template_name=constants.RESULT_TMPL,
+                context=context
+            )
         except ValidationError as e:
             print(f"Invalid request body. Error: {e}")
             traceback.print_exc()

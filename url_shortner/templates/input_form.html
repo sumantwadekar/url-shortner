@@ -1,0 +1,14 @@
+
+<div class="container" id="shortner_container">
+    <form>
+        {% csrf_token %}
+        <label for="url">Enter URL:</label>
+        <input type="url" id="url" name="long_url" required placeholder="https://example.com">
+        <button type="submit" hx-post="{{shorten_url}}" hx-target="#result" hx-swap="innerHTML"
+            hx-trigger="click" class="btn btn-primary">
+            Shorten
+        </button>
+    </form>
+
+    <div id="result"></div>
+</div>
