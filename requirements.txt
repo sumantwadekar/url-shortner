@@ -3,3 +3,4 @@ psycopg2
 djangorestframework
 django_jinja
 drf-yasg
+gunicorn
