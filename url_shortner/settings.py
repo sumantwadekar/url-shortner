@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-p8adfikr(m#ewrvcykct0z+i0n4hf%*(o3#z5yip8tkspdm82g
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['url-shortner-71w1.onrender.com']
+ALLOWED_HOSTS = ['url-shortner-71w1.onrender.com', '*']
 
 
 # Application definition
@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "debug_toolbar",
     "rest_framework",
     "drf_yasg",
     "shortner",
@@ -51,6 +52,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware"
 ]
 
 ROOT_URLCONF = "url_shortner.urls"
@@ -59,8 +61,8 @@ SETTINGS_PATH = os.path.dirname(__file__)
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR, 'templates')],
-        "APP_DIRS": False,
+        "DIRS": [],
+        "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
