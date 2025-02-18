@@ -4,3 +4,4 @@ djangorestframework
 django_jinja
 drf-yasg
 gunicorn
+django-debug-toolbar
